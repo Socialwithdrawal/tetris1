@@ -1,5 +1,9 @@
+/* addEventListener() は EventTarget インターフェイスのメソッドで、ターゲットに特定のイベントが配信されるたびに呼び出される関数を設定します。
+DOMContentLoaded イベントは、 HTML の初期文書が完全に読み込まれ解釈された時点で発生し、スタイルシート、画像、サブフレームの読み込みが完了するのを待ちません。 */
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.querySelector('.grid')
+/* Array.from() メソッドは、反復可能オブジェクトや配列風オブジェクトからシャローコピー(コピー元と同じ参照をする)された、新しい Array インスタンスを生成します。
+この場合.gridクラスのついたdiv(200個)を配列に入れた変数squaresを作る */
     let squares = Array.from(document.querySelectorAll('.grid div'))
     const scoreDisplay = document.querySelector('#score')
     const startBtn = document.querySelector('#start-button')
@@ -59,26 +63,34 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(theTetrominoes[0][0])
   
     //テトロミノとその一回転をランダムに選択する。
+/*  Math.floor() 関数は与えられた数値以下の最大の整数を返します。
+    Math.random() 関数は、 0 以上 1 未満 (0 は含むが、 1 は含まない) の範囲で浮動小数点の擬似乱数を返します。
+    この場合はtheTetrominoesのlength = 5なので0,1,2,3,4をランダムに返します */
     let random = Math.floor(Math.random()*theTetrominoes.length)
     let current = theTetrominoes[random][currentRotation]
+  
     //テトロミノを描写
+/*  forEach() メソッドは、与えられた関数を、配列の各要素に対して一度ずつ実行します。
+    classListとは特定の要素のクラス名を追加したり、参照したり出来るプロパティです。classList.addはクラスを追加するメソッドです。
+    style.backgroundColorは、要素のスタイル属性のbackground-colorプロパティの値を取得、もしくは、設定するプロパティです。 */
     function draw() {
       current.forEach(index => {
-        squares[currentPosition + index].classList.add('tetromino')
-        squares[currentPosition + index].style.backgroundColor = colors[random]
+        squares[currentPosition + index].classList.add('tetromino')//配列から一つずつ取り出して、[]に指定されたdivにtetrominoを追加する
+        squares[currentPosition + index].style.backgroundColor = colors[random]//生成されたtetrominoクラスの色をランダムに変える
       })
     }
   
     //テトロミノを外す
+    //classList.removeは指定された要素のクラスを削除するメソッドです
     function undraw() {
       current.forEach(index => {
-        squares[currentPosition + index].classList.remove('tetromino')
-        squares[currentPosition + index].style.backgroundColor = ''
-  
+        squares[currentPosition + index].classList.remove('tetromino')//drawで追加されたtetrominoを削除する
+        squares[currentPosition + index].style.backgroundColor = ''//backgroudcolorを消さないとテトロミノの轍跡が残るので、それを消す
       })
     }
   
     //keyCodeに関数を割り当てる
+    //37は左の矢印キーが押された時のキーコード、その他も同様
     function control(e) {
       if(e.keyCode === 37) {
         moveLeft()
@@ -90,8 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
         moveDown()
       }
     }
+    /* keyupイベントは、キーが離れた時に発生します。keyupはキーを話した時、keydownはキーを押下した時にイベントが発生します
+    keydownでは押しっぱなしで入力されたキー情報が取得できますが、keyupでは取得することができません。
+    今回の場合押下ごとに移動するので、keyupを使ってるっぽい */
     document.addEventListener('keyup', control)
-  
+    
     //テトロミノが降ってくるようにする
     function moveDown() {
       undraw()
@@ -99,12 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
       draw()
       freeze()
     }
-    console.log(current.some(index => squares[currentPosition + index + width].classList.contains('taken')))
+  
     //フリーズ機能
     function freeze() {
       if(current.some(index => squares[currentPosition + index + width].classList.contains('taken'))) {
         current.forEach(index => squares[currentPosition + index].classList.add('taken'))
-        
         //テトリスを開始する
         random = nextRandom
         nextRandom = Math.floor(Math.random() * theTetrominoes.length)
